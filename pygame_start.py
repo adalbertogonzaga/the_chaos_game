@@ -4,8 +4,10 @@ An implementation of "The Chaos Game!" / Sierpinski Triangle
 import random
 import pygame
 
+BACKGROUND_COLOR = (128, 128, 128)
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
+
 
 def draw_labels(screen):
     """
@@ -51,6 +53,20 @@ def get_triangle_points(screen):
     return top_dot_position, left_dot_position, right_dot_position
 
 
+def draw_score(screen, score):
+    score_surface_width = 200
+    score_surface = pygame.Surface((score_surface_width, 10))
+    score_surface.fill(BACKGROUND_COLOR)
+
+    my_font = pygame.font.SysFont('Comic Sans MS', 16)
+    score_text = score.zfill(6)
+    score_text = my_font.render(f"Drawn dots {score_text}", True, (0, 0, 0))
+    width, height = screen.get_size()
+
+    score_surface.blit(score_text, (0, 0))
+    screen.blit(score_surface, (width - score_surface_width, 5))
+
+
 def draw_random_points(screen, click_position):
     """
     Based on an initial click, starts drawing points on the halfway
@@ -65,28 +81,12 @@ def draw_random_points(screen, click_position):
     next_point_pos = random.choice( (0, 1, 2) )
     next_point = get_halfway_point( triangle_points[next_point_pos], click_position)
 
-    ###################################################################
-    my_font = pygame.font.SysFont('Comic Sans MS', 16)
-    score_text = "0"
-    score_text = score_text.zfill(6)
-    score_surface = my_font.render(f"Draw dots {score_text}", True, (0, 0, 0))
-    width, height = screen.get_size()
-
-    screen.blit(score_surface, (width-200,5))
-
-    ###################################################################
-
-
-
     for i in range(0, MAX_DOTS_COUNTS):
         pygame.draw.circle(screen, (0,128,255), next_point, 1)
         next_point_pos = random.choice( (0, 1, 2) )
         next_point = get_halfway_point( triangle_points[next_point_pos], next_point)
 
-        score_text = str(i)
-        score_text = score_text.zfill(6)
-        score_surface = my_font.render(f"Draw dots {score_text}", True, (0, 0, 0))
-        screen.blit(score_surface, (width-200,5))
+        draw_score(screen, str(i + 1))
 
         # Update the display
         pygame.display.flip()
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     my_screen = pygame.display.set_mode(window_size)
 
     # Set the background color
-    my_screen.fill((128, 128, 128))
+    my_screen.fill(BACKGROUND_COLOR)
 
     pygame.display.set_caption("The Chaos Game! - A Sierpinski Triangle visualization")
 

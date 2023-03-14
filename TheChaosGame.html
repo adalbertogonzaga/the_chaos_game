@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>The Chaos Game</title>
+	</head>	
+<body>
+<h1>The Chaos Game</h1>
+<!-- https://www.quora.com/What-are-some-mind-blowing-facts-that-sound-like-BS-but-are-actually-true/answer/David-Prifti-1?srid=478Q -->
+<p>An implementation of <a href="https://en.wikipedia.org/wiki/Chaos_game">The Chaos Game</a>, which I firstly read about on
+<a href="https://www.quora.com/What-are-some-mind-blowing-facts-that-sound-like-BS-but-are-actually-true/answer/David-Prifti-1?srid=478Q">Quora.</a><br/>
+To start it, just click in any point between the A, B or C dots in the below canvas.
+</p>
+<hr/>
+<canvas id="chaosCanvas" width="1300" height="540" style="height: 76vh; width: 98vw; display: block; border:1px solid #000000; resize:both; overflow:auto;">
+</canvas>
+<script>
+
+// initializing some variables...
+var canvas = document.getElementById("chaosCanvas");
+// The getContext() is a built-in HTML object, with properties and methods for drawing
+var context = canvas.getContext("2d");
+
+// just a flag to control if the "chaos" had already started...
+var started = false;
+
+// these variables are intended to store the position of last drawn dots
+var lastX = 0;
+var lastY = 0;
+
+// creating a structure to hold the A, B, C dots position..
+var Dot = function (x, y) {
+	this.x = Math.floor(x);
+	this.y = Math.floor(y);
+};
+
+/**************************** A,B,C DOTS ****************************/
+// "A" dot
+var x = canvas.width/2;
+var y = 10; // just for not touching the canvas border...
+var aDot = new Dot(x, y);
+
+// drawing the "A" dot on the Canvas
+context.fillStyle = "red";
+context.beginPath();
+context.arc(aDot.x, aDot.y, 3, 0, 2*Math.PI);
+context.fill();
+
+// drawing the letter "A" 
+context.font = "24px Comic Sans MS";
+context.fillText("A", aDot.x-30, aDot.y+10);
+
+// "B" dot
+x = 30;
+y = canvas.height-10;
+var bDot = new Dot(x, y);
+
+// drawing the dot "B" on the Canvas
+context.beginPath();
+context.arc(bDot.x, bDot.y, 3, 0, 2*Math.PI);
+context.fill();
+
+// drawing the letter "B" 
+context.fillText("B", bDot.x-20, bDot.y+5);
+
+// "C" dot
+x = canvas.width-30;
+y = canvas.height-10;
+var cDot = new Dot(x, y);
+
+// drawing the dot "C" on the Canvas
+context.beginPath();
+context.arc(cDot.x, cDot.y, 3, 0, 2*Math.PI);
+context.fill();
+
+// drawing the letter "C" 
+context.fillText("C", cDot.x+5, cDot.y+5);
+
+/**************************** END of DOTS ****************************/
+
+// a simple function to draw the dots on the canvas using the context object
+function drawDot(x, y) {
+
+	context.fillStyle = "gray";
+	
+	context.beginPath();
+	
+	// arc(x,y,r,startangle,endangle)
+	context.arc(x, y, 1, 0, 2*Math.PI);
+	context.fill();
+};
+
+// this function is a "Dice Simulator", which will randomly return a number ranging from 1 to 6.
+function rollTheDice() {
+	
+	var min = 1;
+	var max = 6;
+	
+	// https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// here is where the pogram starts to run. it is called when the user clicks on the canvas
+function startChaos() {
+	
+	console.log("startChaos()");
+	
+	numberOfDots = 25000;
+	i = 0;
+	
+	var dice = rollTheDice();
+	
+	setInterval(
+		function(){
+		
+			if (i > numberOfDots) return;
+			
+			var count = 0;
+			var referenceDot = new Dot(0,0);
+			
+			while (count<50) { // for each time this function is called, it will draw only 50 points...
+				
+				if (dice == 1 || dice == 2)
+					referenceDot = aDot;
+					
+				else if (dice == 3 || dice == 4)
+					referenceDot = bDot;
+					
+				else
+					referenceDot = cDot;
+				
+				// calculating the dot which is in the half distance between the reference dot and the last drawn dot
+				lastX = Math.floor( (referenceDot.x + lastX)/2 );
+				lastY = Math.floor( (referenceDot.y + lastY)/2 );
+				
+				drawDot(lastX, lastY);
+				
+				dice = rollTheDice();
+				i++;
+				count++;
+			}			
+			
+		},
+		10   // each 2 milliseconds the above function will be called
+	);
+}
+
+// attaching the "onclick" event to the canvas...
+canvas.onclick = function(e) {
+	if (!started) {
+		console.log("The Canvas was clicked!, starting...");
+		console.log("Drawing the first dot on: ", e.offsetX, e.offsetY);
+		drawDot(e.offsetX, e.offsetY);
+		lastX = e.offsetX;
+		lastY = e.offsetY;
+		started = true;
+		console.log("Starting the chaos...");
+		startChaos();
+	}
+};
+
+// Set the fill style of the drawing object to the color red:
+// context.fillStyle = "#FF0000";
+// The fillRect(x,y,width,height) method draws a rectangle, filled with the fill style, on the canvas:
+// context.fillRect(40,40,260,200);
+</script>
+</body>
+</html>

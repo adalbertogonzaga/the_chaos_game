@@ -10,7 +10,7 @@ I did the Chaos Game implementation for the 1st time using a simple Java Script 
 
 ## Python implementation
 
-Many years after "finishing" the HTML/Java Script implementation I've decided to the same thing but using Python. I thought it would be a good idea for having the first contact with the [PyGame](https://www.pygame.org/wiki/about) library.
+Many years after "finishing" the HTML/Java Script implementation I've decided to do the same thing but using Python. I thought it would be a good idea for having the first contact with the [PyGame](https://www.pygame.org/wiki/about) library.
 
 ### How to run it
 

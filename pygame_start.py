@@ -54,6 +54,11 @@ def get_triangle_points(screen):
 
 
 def draw_score(screen, score):
+    """
+    Draw a box with a text that represent the number of points already drawn on the screen.
+
+    Puts that box always at the same damn place, so it creates the illusion that the number is changing.
+    """
     score_surface_width = 200
     score_surface = pygame.Surface((score_surface_width, 10))
     score_surface.fill(BACKGROUND_COLOR)
@@ -67,14 +72,14 @@ def draw_score(screen, score):
     screen.blit(score_surface, (width - score_surface_width, 5))
 
 
-def draw_random_points(screen, click_position):
+def draw_random_points(screen, click_position, points):
     """
     Based on an initial click, starts drawing points on the halfway
     between this initial clicked/picked point and one of 3 points from
     the triangle (random picked)
     """
 
-    MAX_DOTS_COUNTS = 30000
+    MAX_DOTS_COUNTS = points
     top_dot_position, left_dot_position, right_dot_position = get_triangle_points(screen)
     triangle_points = [top_dot_position, left_dot_position, right_dot_position]
 
@@ -109,7 +114,9 @@ def start_chaos_game(screen, mouse_position):
     pygame.draw.circle(screen, (0, 0, 0), mouse_position, 2)
     # Update the display
     pygame.display.flip()
-    draw_random_points(screen, mouse_position)
+
+    POINTS_TO_DRAW = 50000
+    draw_random_points(screen, mouse_position, POINTS_TO_DRAW)
 
 
 def init_screen(screen):

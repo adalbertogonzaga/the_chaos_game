@@ -3,10 +3,14 @@ An implementation of "The Chaos Game!" / Sierpinski Triangle
 """
 import random
 import pygame
+import pygame_menu
 
 BACKGROUND_COLOR = (128, 128, 128)
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
+GAME_SCREEN = None
+GAME_MENU = None
+STARTED = False
 
 
 def draw_labels(screen):
@@ -94,7 +98,8 @@ def draw_random_points(screen, click_position, points):
         draw_score(screen, str(i + 1))
 
         # Update the display
-        pygame.display.flip()
+        if i % 99 == 0:
+            pygame.display.flip()
 
 
 def get_halfway_point(point_a, point_b):
@@ -119,13 +124,51 @@ def start_chaos_game(screen, mouse_position):
     draw_random_points(screen, mouse_position, POINTS_TO_DRAW)
 
 
-def init_screen(screen):
+def init_screen(**kwargs):
     """
     Calls all the necessary functions to setup the init screen
     """
-    draw_labels(screen)
-    top_dot_position, left_dot_position, right_dot_position = get_triangle_points(screen)
-    draw_initial_triangle(screen, top_dot_position, left_dot_position, right_dot_position)
+    print("init_screen", kwargs)
+    global GAME_SCREEN
+    global STARTED
+
+    draw_labels(GAME_SCREEN)
+    top_dot_position, left_dot_position, right_dot_position = get_triangle_points(GAME_SCREEN)
+    draw_initial_triangle(GAME_SCREEN, top_dot_position, left_dot_position, right_dot_position)
+    
+    STARTED = True
+    GAME_MENU.full_reset()
+    pygame.display.flip()
+
+def set_fractal(value, fractal):
+    """
+    Sets the chosen fractal
+    """
+    print(value, fractal)
+
+def create_initial_menu():
+    """
+    Draws the initial menu
+    """
+    menu = pygame_menu.Menu(
+        'Welcome',
+        SCREEN_WIDTH-50, SCREEN_HEIGHT-50,
+        theme=pygame_menu.themes.THEME_BLUE
+    )
+
+    # menu.add.text_input("What's your name?", default='John Capybara')
+    menu.add.selector(
+        'Fractal :',
+        [
+            ('Sierpinski Triangle', 1),
+            ('Restricted Chaos - Square 01', 2),
+        ],
+        onchange=set_fractal
+    )
+    menu.add.button('Start', init_screen)
+    menu.add.button('Quit', pygame_menu.events.EXIT)
+
+    return menu
 
 
 if __name__ == "__main__":
@@ -137,6 +180,8 @@ if __name__ == "__main__":
 
     # Create the window
     my_screen = pygame.display.set_mode(window_size)
+    # global GAME_SCREEN
+    GAME_SCREEN = my_screen
 
     # Set the background color
     my_screen.fill(BACKGROUND_COLOR)
@@ -149,17 +194,30 @@ if __name__ == "__main__":
     # Run the Pygame loop
     running = True
 
-    init_screen(my_screen)
+    # init_screen(my_screen)
+    menu = create_initial_menu()
+    GAME_MENU = menu
 
     while running:
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        if STARTED:
+            pass
+            #menu.full_reset()
+            #menu.disable()
+        for event in events:
             if event.type == pygame.QUIT:
                 running = False
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif menu.is_enabled() and not STARTED:
+                menu.update(events)
+                menu.draw(my_screen)
+                
+            elif event.type == pygame.MOUSEBUTTONDOWN and STARTED:
                 # Get the mouse position
                 mouse_pos = pygame.mouse.get_pos()
                 start_chaos_game(my_screen, mouse_pos)
+            
+            pygame.display.update()
 
     # Quit Pygame
     pygame.quit()
